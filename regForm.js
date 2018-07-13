@@ -22,7 +22,9 @@ class RegForm extends Component {
             city:'',
             hobbies:'',
             about:'',
-            errors : []
+            errors : {
+
+            }
         }
     }
 
@@ -36,18 +38,64 @@ class RegForm extends Component {
         this.setState(object);
     }
     sendValues(){
+        var err ={}
         if(this.state.email == ""){
-            this.state.errors['email'] = "Cannot be empty";
-
-            console.log(this.state.errors['email']);
-            $("#email").addClass("valid");
-            return false;
+            err['email']= "Email cannot be empty";
+        }else if(this.state.email != ""){
+            var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+            //var address = document.getElementById[email].value;
+            if (reg.test(this.state.email) == false) 
+            {
+                err['email']= "Invalid Email address format";                
+            }
         }
 
+        if(this.state.password == ""){
+            err['password'] = "Password cannot be empty";
+        }else if(this.state.password != ""){
+            if(this.state.password.length < 6){
+                err['password'] = "Password should be atleast 6 characters";
+            }
+        }
+
+        if(this.state.cpassword == ""){
+            err['cpassword'] = "Please confirm password";
+        }else if(this.state.cpassword != ""){
+            if(this.state.cpassword.length < 6){
+                err['cpassword'] = "Password should be atleast 6 characters";
+            }
+        }
+
+        if(this.state.password != this.state.cpassword){
+            err['cpassword'] = "Password and Confirm password should be same";
+        }
+        if(this.state.firstname == ""){
+            err['firstname'] = "Please enter firstname";
+        }  
+        if(this.state.lastname == ""){
+            err['lastname'] = "Please enter lastname";
+        }
+        if(this.state.phone == ""){
+            err['phone'] = "Please enter phonenumber";
+        } else if(this.state.phone != ""){
+            if(this.state.phone.length != 10){
+                err['phone'] = "Phone number should be 10 digit number";
+            }
+        } 
+        if(this.state.city == ""){
+            err['city'] = "Please enter city";
+        } 
+        if(this.state.about == ""){
+            err['about'] = "Please enter about";
+        }    
+
+
+        this.setState({errors:err});
     }
 
     /* It is invoked to return html content */
     render() {
+        console.log(this.state.errors,"Errors");
         return (
             <div>
                 <div className="regContainer">
@@ -57,19 +105,23 @@ class RegForm extends Component {
                         <div className="fields">
                             <div className="fieldname">UserName / Email :</div>
                             <div className="fieldvalue">
-                                {console.log(this.state.errors) }
                                 <input type="email" id="email" onChange={this.setValue.bind(this, 'email')} value={this.state.email} />
+                                { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.email}</p>: '' }
                             </div>
                         </div>
 
                         <div className="fields">
                             <div className="fieldname">Password :</div>
-                            <div className="fieldvalue"><input type="password" onChange={this.setValue.bind(this, 'password')} value={this.state.password} /></div>
+                            <div className="fieldvalue"><input type="password" onChange={this.setValue.bind(this, 'password')} value={this.state.password} />
+                            { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.password}</p>: '' }
+                            </div>
                         </div>
 
                         <div className="fields">
                             <div className="fieldname">Confirm Password :</div>
-                            <div className="fieldvalue"><input type="password" onChange={this.setValue.bind(this, 'cpassword')} value={this.state.cpassword} /></div>
+                            <div className="fieldvalue"><input type="password" onChange={this.setValue.bind(this, 'cpassword')} value={this.state.cpassword} />
+                            { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.cpassword}</p>: '' }
+                            </div>
                         </div>
 
                     </div>
@@ -79,12 +131,16 @@ class RegForm extends Component {
 
                         <div className="fields half">
                             <div className="fieldname">First Name :</div>
-                            <div className="fieldvalue"><input type="text" onChange={this.setValue.bind(this, 'firstname')} value={this.state.firstname} /></div>
+                            <div className="fieldvalue"><input type="text" onChange={this.setValue.bind(this, 'firstname')} value={this.state.firstname} />
+                            { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.firstname}</p>: '' }
+                            </div>
                         </div>
 
                         <div className="fields half fright">
                             <div className="fieldname">LastName :</div>
-                            <div className="fieldvalue"><input type="text" onChange={this.setValue.bind(this, 'lastname')} value={this.state.lastname} /></div>
+                            <div className="fieldvalue"><input type="text" onChange={this.setValue.bind(this, 'lastname')} value={this.state.lastname} />
+                            { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.lastname}</p>: '' }
+                            </div>
                         </div>
                         <div className="fields">
                             <div className="fieldname">Gender :</div>
@@ -95,7 +151,9 @@ class RegForm extends Component {
                         </div>
                         <div className="fields">
                             <div className="fieldname">Phone Number :</div>
-                            <div className="fieldvalue"><input type="number" onChange={this.setValue.bind(this, 'phone')} value={this.state.phone} /></div>
+                            <div className="fieldvalue"><input type="number" onChange={this.setValue.bind(this, 'phone')} value={this.state.phone} />
+                            { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.phone}</p>: '' }
+                            </div>
                         </div>
                         <div className="fields">
                             <div className="fieldname">City :</div>
@@ -105,6 +163,7 @@ class RegForm extends Component {
                                     <option value="Hyderabad">Hyderabad</option>
                                     <option value="Secunderabad">Secunderabad</option>
                                 </select>
+                                { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.city}</p>: '' }
                             </div>
                         </div>
                         <div className="fields">
@@ -119,6 +178,7 @@ class RegForm extends Component {
                             <div className="fieldname">About : </div>
                             <div className="fieldvalue">
                                 <textarea onChange={this.setValue.bind(this, 'about')} value={this.state.about}></textarea>
+                                { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.about}</p>: '' }
                             </div>
                         </div>
 
