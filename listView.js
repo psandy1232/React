@@ -23,11 +23,7 @@ class ListView extends Component {
 
             ],
             am_index: 0,
-            iid:'',
-            iuserid: '',
-            ititle: '',
-            ibody: '',
-
+            addItemsArray: [{ iuserid: '',ititle: '',ibody:'' }]
         }
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -89,59 +85,18 @@ class ListView extends Component {
         object[field] = e.target.value;
         this.setState(object);
     }
-    setValueInput(field,e,i) {
-        console.log(field,e,i,"HAHAHA");
-        var object = {};
-        object[field] = e.target.value;
-        console.log(object);    
-        this.setState(object);
-    }
-    addMore(field, e) {
-        //console.log(field," e value is");
-        //let newdata = {userId:0 ,id: 23456, title: "Sandeep", body: "testing"};
-
-        //console.log(field, "Fiedls");
-        let newdata = { userid: field.iuserId[e], id: field.iid[e], title: field.ititle[e], body: field.ibody[e] }
-        let existingData = this.state.data;
-        existingData.unshift(newdata);
-        // this.state.data.push(newdata);
-        this.setState({ data: existingData });
-        //console.log("NewData", existingData);
-
-        //this.setState({data: newData});
-        //console.log("All ==> ",this.state.data);
-    }
-
-    // addMore() {
-    //     this.setState({
-    //         addMore: _.concat(this.state.addMore, 1)
-    //     })
-    // }
-
-    createUI(itest) {
-        return this.state.values.map((el, i) =>
-            <div key={i}>
-                <input type="text" style={itest} value={this.state.iuserid} onChange={this.setValueInput.bind(this,'iuserid',i)} required id="iuserid{i}" placeholder='User ID' />
-                <input type="text" style={itest} value={this.state.ititle[i]} onChange={this.setValue.bind(this, 'ititle[i]')} required id="ititle[i]" placeholder='Title' />
-                <textarea id="body[i]" style={itest} placeholder='Body' onChange={this.setValue.bind(this, 'body[i]')} value={this.state.body[i]} />
-                <button type='button' className="btn btn-alert" onClick={this.addMore.bind(this, el, i)}><i className="fa fa-cloud" aria-hidden="true"></i> Save</button> &nbsp;&nbsp;
-                <input type='button' className="btn btn-danger" value='- Remove' onClick={this.removeClick.bind(this, i)} />
-            </div>
-        )
-    }
 
     addClick() {
         $(".btnSubmit").removeClass('hide');
-            
         this.setState(prevState => ({ values: [...prevState.values, ''] }))
     }
 
     removeClick(i) {
         console.log(this.state.values);
-        if(this.state.values.length > 1)
-            $(".btnSubmit").removeClass('hide');    
+        if (this.state.values.length > 1)
+            $(".btnSubmit").removeClass('hide');
         else
-        $(".btnSubmit").addClass('hide');    
+            $(".btnSubmit").addClass('hide');
 
         let values = [...this.state.values];
         values.splice(i, 1);
@@ -154,12 +109,43 @@ class ListView extends Component {
         event.preventDefault();
     }
 
+    
+    addItems() {
+        const addItemsArray = _.concat(this.state.addItemsArray, [{ iuserid: '', ititle: '', ibody: '' }]);
+        this.setState({ addItemsArray });
+    }
+    async valueSet(field, i, evt) {
+        //console.log("Field =>",field, "Event =>",evt);
+        // console.log("Target Value",evt.target.value);
+        if (field == 'iuserid') {
+            const existingPost = this.state.addItemsArray[i];
+            const updatedPost = update(existingPost, { iuserid: { $set: evt.target.value } });
+            let updatedPosts = update(this.state.addItemsArray, { [i]: { $set: updatedPost } });
+            await this.setState({ addItemsArray: updatedPosts });
+
+        }
+        if (field == 'ititle') {
+            const existingPost = this.state.addItemsArray[i];
+            const updatedPost = update(existingPost, { ititle: { $set: evt.target.value } });
+            let updatedPosts = update(this.state.addItemsArray, { [i]: { $set: updatedPost } });
+            await this.setState({ addItemsArray: updatedPosts });
+
+        }
+        if (field == 'ibody') {
+            const existingPost = this.state.addItemsArray[i];
+            const updatedPost = update(existingPost, { ibody: { $set: evt.target.value } });
+            let updatedPosts = update(this.state.addItemsArray, { [i]: { $set: updatedPost } });
+            await this.setState({ addItemsArray: updatedPosts });
+
+        }
+    }
+
 
 
     /* It is invoked to return html content */
-
     render() {
         // console.log(this.state.data, '== data');
+         console.log("ArrayItems", this.state.addItemsArray);
         var no_of_records = this.state.data.length;
         var tableStyle = {
             border: '1px solid #ccc',
@@ -208,23 +194,28 @@ class ListView extends Component {
         return (
             <div>
                 {/* {Add more elements to this.state.data object at a time } */}
-                {/* <button className="btn btn-success" onClick={this.AddMore.bind(this,this.state.am_index)}>+Add More</button>
-                <div className="addMoreToAdd">
-                    <div className="morediv">
-                        <input type="text" value={this.state.iuserid} className="form-control" required id="iuserid" placeholder='User ID'  />
-                        <input type="text" value={this.state.ititle} className="form-control" required id="ititle" placeholder='Title'  />
-                        <textarea className="form-control" id="ibody" placeholder='Body' value={this.state.ibody} />
-                        <button className="btn btn-danger">-Remove</button>    
-                    </div>
-                </div> */}
 
                 <form onSubmit={this.handleSubmit}>
                     <div style={addMoreToAdd} >
-                        {this.createUI(itest)}
-                        <input type='button' value='+ Add More' className="btn btn-success" onClick={this.addClick.bind(this)} />
+                        {/* {this.createUI(itest)} */}
+                        {console.log(this.state.addItemsArray)}
+                        
+                        {this.state.addItemsArray.map((el, i) =>
+                            <div key={i}>
+                                <input type="text" style={itest} placeholder="User ID" value={el.iuserid} onChange={this.valueSet.bind(this, 'iuserid', i)} name={i}/>
+                                <input type="text" style={itest} placeholder="Title" value={el.ititle} onChange={this.valueSet.bind(this, 'ititle', i)} name={i}/>
+                                <input type="text" style={itest} placeholder="Body" value={el.ibody} onChange={this.valueSet.bind(this, 'ibody', i)} name={i}/>
+
+                                <button type='button' className="btn btn-alert" onClick={this.addItems.bind(this, el, i)}><i className="fa fa-cloud" aria-hidden="true"></i> Save</button> &nbsp;&nbsp;
+                                <input type='button' className="btn btn-danger" value='- Remove' onClick={this.removeClick.bind(this, i)} />
+                            </div>
+                        )}
+                        
+
+                        <input type='button' value='+ Add More' className="btn btn-success" onClick={this.addItems.bind(this)} />
                         &nbsp;
                         <input type="submit" value="Submit" className="btn btn-alert btnSubmit hide" />
-                    </div>  
+                    </div>
                 </form>
 
 
