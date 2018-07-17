@@ -47,7 +47,7 @@ class RegForm extends Component {
         this.setState(object);
     }
     sendValues(){
-        var err ={}
+        var err =[];
         if(this.state.email == ""){
             err['email']= "Email cannot be empty";
         }else if(this.state.email != ""){
@@ -110,15 +110,25 @@ class RegForm extends Component {
         } 
         
         
+        if(Object.keys(err).length > 0){
+            this.setState({errors:err}); 
+        }else{
+            alert("No errors found.");
+        }
+        
+        // if(Object.keys(this.state.errors).length > 0){
+        //     console.log("Test =>",this.state.errors);
+        // }else{
+        //     console.log("Test 2 =>",this.state.errors);
+        // }
 
-        this.setState({errors:err});
     }
 
     async valueSet(field, i, evt) {
         const existingPost = this.state.arrHobbies[i];
         const updatedPost = update(existingPost, { value: { $set: evt.target.checked ? evt.target.value : '' } });
         let updatedPosts = update(this.state.arrHobbies, { [i]: { $set: updatedPost } });
-        console.log(updatedPosts,'cheVALLL>>');
+        //console.log(updatedPosts,'cheVALLL>>');
         await this.setState({ arrHobbies: updatedPosts });
     }
 
