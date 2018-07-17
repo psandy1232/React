@@ -20,12 +20,21 @@ class RegForm extends Component {
             gender:'',
             phone:'',
             city:'',
-            hobbies:'',
+            hobbies: [
+                { value: 'orange' },
+                { value: 'apple' },
+                { value: 'grape' }
+            ],
             about:'',
             errors : {
 
-            }
-        }
+            },
+            arrHobbies: [
+                { value: '' },
+                { value: '' },
+                { value: '' }
+            ]
+        }        
     }
 
     componentDidMount() {
@@ -43,9 +52,7 @@ class RegForm extends Component {
             err['email']= "Email cannot be empty";
         }else if(this.state.email != ""){
             var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-            //var address = document.getElementById[email].value;
-            if (reg.test(this.state.email) == false) 
-            {
+            if (reg.test(this.state.email) == false) {
                 err['email']= "Invalid Email address format";                
             }
         }
@@ -75,6 +82,9 @@ class RegForm extends Component {
         if(this.state.lastname == ""){
             err['lastname'] = "Please enter lastname";
         }
+        if(this.state.gender == ""){
+            err['gender'] = "Please select gender";
+        }
         if(this.state.phone == ""){
             err['phone'] = "Please enter phonenumber";
         } else if(this.state.phone != ""){
@@ -84,18 +94,37 @@ class RegForm extends Component {
         } 
         if(this.state.city == ""){
             err['city'] = "Please enter city";
-        } 
+        }
+        var errNum = 0;
+        for(let i=0;i<this.state.arrHobbies.length; i++){
+            if(this.state.arrHobbies[i].value != ''){
+                errNum++;
+            }
+        }
+        if(errNum == 0){
+            err['hobbies'] = "Please select atleast one hobbie.";
+        }
+        
         if(this.state.about == ""){
             err['about'] = "Please enter about";
-        }    
-
+        } 
+        
+        
 
         this.setState({errors:err});
     }
 
+    async valueSet(field, i, evt) {
+        const existingPost = this.state.arrHobbies[i];
+        const updatedPost = update(existingPost, { value: { $set: evt.target.checked ? evt.target.value : '' } });
+        let updatedPosts = update(this.state.arrHobbies, { [i]: { $set: updatedPost } });
+        console.log(updatedPosts,'cheVALLL>>');
+        await this.setState({ arrHobbies: updatedPosts });
+    }
+
     /* It is invoked to return html content */
     render() {
-        console.log(this.state.errors,"Errors");
+        //console.log(this.state.errors,"Errors");
         return (
             <div>
                 <div className="regContainer">
@@ -145,8 +174,9 @@ class RegForm extends Component {
                         <div className="fields">
                             <div className="fieldname">Gender :</div>
                             <div className="fieldvalue">
-                                <p><input type="radio" value="Male" onClick={this.setValue.bind(this, 'gender')} value={this.state.gender} /> Male </p>
-                                <p><input type="radio" value="Female" onClick={this.setValue.bind(this, 'gender')} value={this.state.gender} /> Female </p>
+                                <p><input type="radio" value="Male" onChange={this.setValue.bind(this,'gender')} checked={this.state.gender === "Male"} /> Male </p>
+                                <p><input type="radio" value="Female" onChange={this.setValue.bind(this,'gender')} checked={this.state.gender === "Female"} /> Female </p>
+                                { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.gender}</p>: '' }
                             </div>
                         </div>
                         <div className="fields">
@@ -166,14 +196,19 @@ class RegForm extends Component {
                                 { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.city}</p>: '' }
                             </div>
                         </div>
+                        
                         <div className="fields">
                             <div className="fieldname">Hobbies : </div>
                             <div className="fieldvalue">
-                                <p><input type="checkbox" onChange={this.setValue.bind(this, 'hobbies')} value={this.state.hobbies} /> Reading novels </p>
-                                <p><input type="checkbox" onChange={this.setValue.bind(this, 'hobbies')} value={this.state.hobbies} /> Playing Cricket </p>
-                                <p><input type="checkbox" onChange={this.setValue.bind(this, 'hobbies')} value={this.state.hobbies} /> Listening Music </p>
+                            {this.state.hobbies.map((opt, i) =>
+                                <div key={i}>
+                                <input type="checkbox" checked={opt.value == this.state.arrHobbies[i].value ? true : false} value={opt.value} id={i} onChange={this.valueSet.bind(this, 'hobbi', i)} name={i} /> {opt.value}
+                                </div>
+                            )}
+                            { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.hobbies}</p>: '' }
                             </div>
-                        </div>
+                        </div>    
+
                         <div className="fields">
                             <div className="fieldname">About : </div>
                             <div className="fieldvalue">
