@@ -23,7 +23,10 @@ class ListView extends Component {
 
             ],
             am_index: 0,
-            addItemsArray: [{ iuserid: '',ititle: '',ibody:'' }]
+            addItemsArray: [{ iuserid: '',ititle: '',ibody:'' }],
+            users : [
+                
+            ]
         }
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -90,17 +93,34 @@ class ListView extends Component {
         $(".btnSubmit").removeClass('hide');
         this.setState(prevState => ({ values: [...prevState.values, ''] }))
     }
+    // appendToTable(){
+    //     this.setState({users :this.state.addItemsArray});
+    // }
+    async appendToTable(){
+        //This is for change total state of previous state of object
+        //await this.setState({users :this.state.addItemsArray});
+        // var index = 0;
+        // this.state.users.length - this.state.addItemsArray.length;
+        // console.log(this.state.addItemsArray.length)
+        
+        
+        //This is for append code to previous object        
+        const users = _.concat(this.state.users, this.state.addItemsArray);
+        this.setState({ users });
+
+        
+    }
 
     removeClick(i) {
         console.log(this.state.values);
-        if (this.state.values.length > 1)
-            $(".btnSubmit").removeClass('hide');
-        else
-            $(".btnSubmit").addClass('hide');
+        // if (this.state.addItemsArray.length > 1)
+        //     $(".btnSubmit").removeClass('hide');
+        // else
+        //     $(".btnSubmit").addClass('hide');
 
-        let values = [...this.state.values];
-        values.splice(i, 1);
-        this.setState({ values });
+        let addItemsArray = [...this.state.addItemsArray];
+        addItemsArray.splice(i, 1);
+        this.setState({ addItemsArray });
     }
 
     handleSubmit(event) {
@@ -109,7 +129,7 @@ class ListView extends Component {
         event.preventDefault();
     }
 
-    
+
     addItems() {
         const addItemsArray = _.concat(this.state.addItemsArray, [{ iuserid: '', ititle: '', ibody: '' }]);
         this.setState({ addItemsArray });
@@ -122,21 +142,18 @@ class ListView extends Component {
             const updatedPost = update(existingPost, { iuserid: { $set: evt.target.value } });
             let updatedPosts = update(this.state.addItemsArray, { [i]: { $set: updatedPost } });
             await this.setState({ addItemsArray: updatedPosts });
-
         }
         if (field == 'ititle') {
             const existingPost = this.state.addItemsArray[i];
             const updatedPost = update(existingPost, { ititle: { $set: evt.target.value } });
             let updatedPosts = update(this.state.addItemsArray, { [i]: { $set: updatedPost } });
             await this.setState({ addItemsArray: updatedPosts });
-
         }
         if (field == 'ibody') {
             const existingPost = this.state.addItemsArray[i];
             const updatedPost = update(existingPost, { ibody: { $set: evt.target.value } });
             let updatedPosts = update(this.state.addItemsArray, { [i]: { $set: updatedPost } });
             await this.setState({ addItemsArray: updatedPosts });
-
         }
     }
 
@@ -145,7 +162,8 @@ class ListView extends Component {
     /* It is invoked to return html content */
     render() {
         // console.log(this.state.data, '== data');
-         console.log("ArrayItems", this.state.addItemsArray);
+        //console.log("ArrayItems", this.state.addItemsArray);
+        
         var no_of_records = this.state.data.length;
         var tableStyle = {
             border: '1px solid #ccc',
@@ -198,7 +216,6 @@ class ListView extends Component {
                 <form onSubmit={this.handleSubmit}>
                     <div style={addMoreToAdd} >
                         {/* {this.createUI(itest)} */}
-                        {console.log(this.state.addItemsArray)}
                         
                         {this.state.addItemsArray.map((el, i) =>
                             <div key={i}>
@@ -206,22 +223,41 @@ class ListView extends Component {
                                 <input type="text" style={itest} placeholder="Title" value={el.ititle} onChange={this.valueSet.bind(this, 'ititle', i)} name={i}/>
                                 <input type="text" style={itest} placeholder="Body" value={el.ibody} onChange={this.valueSet.bind(this, 'ibody', i)} name={i}/>
 
-                                <button type='button' className="btn btn-alert" onClick={this.addItems.bind(this, el, i)}><i className="fa fa-cloud" aria-hidden="true"></i> Save</button> &nbsp;&nbsp;
+                                {/* <button type='button' className="btn btn-alert" onClick={this.addItems.bind(this, el, i)}><i className="fa fa-cloud" aria-hidden="true"></i> Save</button> &nbsp;&nbsp; */}
+                                {i > 0 ? 
                                 <input type='button' className="btn btn-danger" value='- Remove' onClick={this.removeClick.bind(this, i)} />
+                                : <input type='button' value='+ Add More' className="btn btn-success" onClick={this.addItems.bind(this)} /> }
                             </div>
                         )}
                         
 
-                        <input type='button' value='+ Add More' className="btn btn-success" onClick={this.addItems.bind(this)} />
+                        {/* <input type='button' value='+ Add More' className="btn btn-success" onClick={this.addItems.bind(this)} /> */}
                         &nbsp;
-                        <input type="submit" value="Submit" className="btn btn-alert btnSubmit hide" />
+                        <input type="button" value="Submit" className="btn btn-alert btnSubmit" onClick={this.appendToTable.bind(this)} />
                     </div>
                 </form>
 
-
-
-
                 <table style={tableStyle}>
+                    <thead>
+                        <th style={thstyle}>ID</th>
+                        <th style={thstyle}>Title</th>
+                        <th style={thstyle}>Body</th>
+                       
+                    </thead>
+
+
+                    {this.state.users.length > 0 ? this.state.users.map((dynamicComponent, index) => <tbody key={index}>
+                        <tr style={trstyle}>
+                            <td style={tdstyle}>{dynamicComponent.iuserid}</td>
+                            <td style={tdstyle}>{dynamicComponent.ititle}</td>
+                            <td style={tdstyle}>{dynamicComponent.ibody}</td>
+                            
+                        </tr>
+                    </tbody>) : <tbody><tr style={trstyle}><td style={norecords} colSpan="4">No Records</td></tr></tbody>}
+                </table>
+
+
+                {/* <table style={tableStyle}>
                     <thead>
                         <th style={thstyle}>ID</th>
                         <th style={thstyle}>Title</th>
@@ -241,7 +277,7 @@ class ListView extends Component {
                             </td>
                         </tr>
                     </tbody>) : <tbody><tr style={trstyle}><td style={norecords} colSpan="4">No Records</td></tr></tbody>}
-                </table>
+                </table> */}
 
                 <div className="modal fade" id="listViewModal" role="dialog">
                     <div className="modal-dialog">
