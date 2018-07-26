@@ -26,6 +26,9 @@ class ListView extends Component {
             addItemsArray: [{ iuserid: '',ititle: '',ibody:'' }],
             users : [
                 
+            ],
+            errors:[
+            
             ]
         }
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -99,15 +102,32 @@ class ListView extends Component {
     async appendToTable(){
         //This is for change total state of previous state of object
         //await this.setState({users :this.state.addItemsArray});
+        
         // var index = 0;
         // this.state.users.length - this.state.addItemsArray.length;
-        // console.log(this.state.addItemsArray.length)
         
-        
-        //This is for append code to previous object        
-        const users = _.concat(this.state.users, this.state.addItemsArray);
-        this.setState({ users });
+        //Code to validate multiple addmores
+        var arrLen = this.state.addItemsArray.length;
+        // console.log(this.state.addItemsArray[0].iuserid,"Iuserid");
+        // return false;
 
+        var err = [];
+        
+        for(var i=0;i<arrLen;i++){
+            if(this.state.addItemsArray[i].iuserid == "" || this.state.addItemsArray[i].ititle == "" || this.state.addItemsArray[i].ibody == ""){
+                err[i] =  'Please enter all fields to continue';
+            }
+        }   
+        
+        if(err.length > 0){
+            this.setState({ errors : err });
+            return false;
+        }else{
+            this.setState({ errors : '' });
+            //This is for append code to previous object        
+            const users = _.concat(this.state.users, this.state.addItemsArray);
+            this.setState({ users });
+        }
         
     }
 
@@ -222,11 +242,12 @@ class ListView extends Component {
                                 <input type="text" style={itest} placeholder="User ID" value={el.iuserid} onChange={this.valueSet.bind(this, 'iuserid', i)} name={i}/>
                                 <input type="text" style={itest} placeholder="Title" value={el.ititle} onChange={this.valueSet.bind(this, 'ititle', i)} name={i}/>
                                 <input type="text" style={itest} placeholder="Body" value={el.ibody} onChange={this.valueSet.bind(this, 'ibody', i)} name={i}/>
-
                                 {/* <button type='button' className="btn btn-alert" onClick={this.addItems.bind(this, el, i)}><i className="fa fa-cloud" aria-hidden="true"></i> Save</button> &nbsp;&nbsp; */}
                                 {i > 0 ? 
                                 <input type='button' className="btn btn-danger" value='- Remove' onClick={this.removeClick.bind(this, i)} />
                                 : <input type='button' value='+ Add More' className="btn btn-success" onClick={this.addItems.bind(this)} /> }
+
+                                { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors[i]}</p>: '' }
                             </div>
                         )}
                         

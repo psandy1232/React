@@ -29,7 +29,7 @@ class SampleForm extends Component {
         object[field] = e.target.value;
         this.setState(object);
     }
-   saveData(){
+    saveData(){
        const obj = {
            'firstName': this.state.firstname,
            'lastName': this.state.lastname,

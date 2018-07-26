@@ -6,6 +6,10 @@ import $ from "jquery";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import update from 'react-addons-update';
+import Servicecalls from './Servicecalls';
+
+
+var httpRequest = new Servicecalls();
 /* IntranetHome Component initialization */
 class RegForm extends Component {
     /* Initializing objects of its IntranetHome class */
@@ -21,9 +25,9 @@ class RegForm extends Component {
             phone:'',
             city:'',
             hobbies: [
-                { value: 'orange' },
-                { value: 'apple' },
-                { value: 'grape' }
+                { value: 'Reading Books' },
+                { value: 'Playing Cricket' },
+                { value: 'Watching TV' }
             ],
             about:'',
             errors : {
@@ -33,15 +37,50 @@ class RegForm extends Component {
                 { value: '' },
                 { value: '' },
                 { value: '' }
-            ]
+            ],
+            status : '',
+            userInfo : '',
+            showhide:-1,
+            uemail:'',
+            ufirstname:'',
+            ulastname:'',
+            uphone:'',
+            ucity:''
+            
         }        
-    }
+    }   
 
     componentDidMount() {
         //console.log("testt");
         $("#email").focus();
+        
+        let _this = this;
+        axios.get('http://localhost/practise/get.php')
+        .then(function (response) {
+            _this.setState({
+                userInfo: response.data
+            });
+        })
+        .catch(function (error) {
+            console.log(error);
+        }); 
+
+        $("#menuIcon").click(function(){
+            $(".toggleTable").slideToggle();            
+        });
+
+        $(document).ready(function(){
+            $(".toggleTable").hide();
+        });
+
     }
+    
+
+
+
     setValue(field, e) {
+        //console.log(field,"Field",e,"Event");
+        
         var object = {};
         object[field] = e.target.value;
         this.setState(object);
@@ -113,16 +152,135 @@ class RegForm extends Component {
         if(Object.keys(err).length > 0){
             this.setState({errors:err}); 
         }else{
-            alert("No errors found.");
-        }
-        
-        // if(Object.keys(this.state.errors).length > 0){
-        //     console.log("Test =>",this.state.errors);
-        // }else{
-        //     console.log("Test 2 =>",this.state.errors);
-        // }
+           const data ={
+                "email":this.state.email,
+                "password":this.state.password,
+                "first_name":this.state.firstname,
+                "last_name":this.state.lastname,
+                "gender":this.state.gender,
+                "phone":this.state.phone,
+                "city":this.state.city,
+                "hobbies":this.state.arrHobbies,
+                "about":this.state.about
+            }
+            const userInfo = _.concat(this.state.userInfo, data);
+            this.setState({ userInfo });
+            //data = JSON.stringify(data);
 
+            const response =  httpRequest.requestPostWithURLEncoded("http://localhost/practise/index.php", data, {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",                
+                }
+            });
+
+            // this.setState({email:'',phone:'',password:'',firstname:'',lastname:'',gender:'',city:'',hobbies:'',about:''});
+            // $(".toggleTable").show();
+
+
+            //console.log(response,"ResponseData");
+            //this.setState({status : response});
+            
+
+        }
     }
+
+    editTableRow(i){
+        this.setState({showhide:i});
+        //console.log("UserInfo", this.state.userInfo);
+        this.setState({uemail:this.state.userInfo[i].email, ufirstname:this.state.userInfo[i].first_name, ulastname:this.state.userInfo[i].last_name, uphone:this.state.userInfo[i].phone, ucity:this.state.userInfo[i].city} );
+        //this.setState({uemail:this.state.userInfo[i].email, ufirstname:this.state.userInfo[i].first_name});
+       
+    }
+    cancelTableRow(){
+        this.setState({showhide:-1});
+    }
+
+    async deleteTableRow(i) {
+        //console.log(this.state.userInfo);
+        
+         var email = this.state.userInfo[i].email;
+         var deleteRow = {'email':email};
+         const response =  await httpRequest.requestPostWithURLEncoded("http://localhost/practise/delete.php", deleteRow, {
+             headers: {
+                 "Content-Type": "application/x-www-form-urlencoded",                
+             }
+         });
+        // console.log(response, 'testing');   
+         if(response.status == 'Success'){
+            await delete this.state.userInfo[i];
+            let remainData = this.state.userInfo;
+            this.setState({ userInfo: remainData });
+
+            this.setState({status:'Data has deleted successfully'});
+            $(".errorTextBox").fadeIn("slow");
+            setTimeout(function(){ $(".errorTextBox").fadeOut("slow"); }, 3000);
+         }else{
+            this.setState({status:'Unable to delete, please try again.'});
+            $(".errorTextBox").fadeIn("slow");
+            setTimeout(function(){ $(".errorTextBox").fadeOut("slow"); }, 3000);
+         }        
+    }
+
+    async saveTableRow(i,updateEmail){
+        var err =[];
+        if(this.state.uemail == ""){
+            err['uemail']= "Email cannot be empty";
+        }else if(this.state.uemail != ""){
+            var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+            if (reg.test(this.state.uemail) == false) {
+                err['uemail']= "Invalid Email address format";                
+            }
+        }
+        if(this.state.ufirstname == ""){
+            err['ufirstname'] = "Please enter firstname";
+        }  
+        if(this.state.ulastname == ""){
+            err['ulastname'] = "Please enter lastname";
+        }
+        if(this.state.uphone == ""){
+            err['uphone'] = "Please enter Phone";
+        }  
+        if(this.state.ucity == ""){
+            err['ucity'] = "Please enter City";
+        }
+        if(Object.keys(err).length > 0){
+            this.setState({errors:err}); 
+        }else{
+            const data ={
+                "email":this.state.uemail,
+                "first_name":this.state.ufirstname,
+                "last_name":this.state.ulastname,
+                "phone":this.state.uphone,
+                "city":this.state.ucity,
+                "updateEmail":updateEmail                
+            }
+
+            const response = await httpRequest.requestPostWithURLEncoded("http://localhost/practise/update.php", data, {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",                
+                }
+            });
+            
+            if($.trim(response.status) == 'Success'){
+                const existingPost = this.state.userInfo[i];
+                const updatedPost = update(existingPost, { email: { $set: this.state.uemail }, phone : { $set: this.state.uphone }, city: { $set: this.state.ucity }, first_name: { $set: this.state.ufirstname }, last_name: { $set: this.state.ulastname } });
+                let updatedPosts = update(this.state.userInfo, { [i]: { $set: updatedPost } });
+                this.setState({ userInfo: updatedPosts });
+                this.setState({showhide:-1});
+                
+                this.setState({status:'Data has updated successfully'});
+                $(".errorTextBox").fadeIn("slow");
+                setTimeout(function(){ $(".errorTextBox").fadeOut("slow"); }, 3000);                
+            }else{
+                this.setState({status:'Unable to update data'});
+                $(".errorTextBox").fadeIn("slow");
+                setTimeout(function(){ $(".errorTextBox").fadeOut("slow"); }, 3000);
+            }
+        }
+    }
+    
+
+
 
     async valueSet(field, i, evt) {
         const existingPost = this.state.arrHobbies[i];
@@ -135,11 +293,86 @@ class RegForm extends Component {
     /* It is invoked to return html content */
     render() {
         //console.log(this.state.errors,"Errors");
+        //console.log(this.state.data,"Table Data");
+        //console.log(this.state.showhide,"Table Data");
+        //console.log("UEMail", this.state.uemail);
+
+        
         return (
-            <div>
-                <div className="regContainer">
+            <div className="bgcolor">
+                 <div className="errorTextBox">
+                    { this.state.status != '' ? this.state.status : '' }
+                 </div>
+                 
+                 <div id="menuIcon"><i className="fa fa-list"></i></div>
+                 <div className="toggleTable">
+                    <table className="tableStyle">
+                        <thead>
+                            <th>S.No</th>
+                            <th>Email</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Phone</th>
+                            <th>City</th>
+                            <th>Actions</th>
+                        </thead>
+
+                        {this.state.userInfo.length > 0 ? this.state.userInfo.map((dynamicComponent, index) => <tbody key={index}>
+                            
+                            {index  == this.state.showhide ? 
+                            <tr id={'tr_'+index}>
+                                <td>{index+1}</td>
+                                <td>
+                                    <input className="form-control" type="email" required id="uemail" placeholder='Email *' onChange={this.setValue.bind(this, 'uemail')} defaultValue={dynamicComponent.email} />
+                                    { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.uemail}</p>: '' }
+                                </td>
+                                <td>
+                                    <input className="form-control" required id="ufirstname" placeholder='First Name' onChange={this.setValue.bind(this, 'ufirstname')} defaultValue={dynamicComponent.first_name} />
+                                    { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.ufirstname}</p>: '' }
+                                </td>
+                                <td>
+                                    <input className="form-control" required id="ulastname" placeholder='Last Name' onChange={this.setValue.bind(this, 'ulastname')} defaultValue={dynamicComponent.last_name} />
+                                    { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.ulastname}</p>: '' }    
+                                </td>
+                                <td>
+                                    <input className="form-control" required id="uphone" placeholder='Phone' onChange={this.setValue.bind(this, 'uphone')} defaultValue={ dynamicComponent.phone} />
+                                    { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.uphone}</p>: '' }    
+                                </td>
+                                <td>
+                                    <input className="form-control" required id="ucity" placeholder='City' onChange={this.setValue.bind(this, 'ucity')} defaultValue={dynamicComponent.city} />
+                                    { Object.keys(this.state.errors).length > 0 ? <p className="errorTxt">{this.state.errors.ucity}</p>: '' } 
+                                </td>
+                                <td>
+                                    <button type="button" name="save" className="btn" onClick={this.saveTableRow.bind(this,index,dynamicComponent.email)} >Save</button> &nbsp;
+                                    <button type="button" name="Cancel" className="btn btn-danger" onClick={this.cancelTableRow.bind(this)} >Cancel</button>
+                                </td>
+                            </tr>
+                            : 
+                            <tr id={'tr_'+index}>
+                                <td>{index+1}</td>
+                                <td>{dynamicComponent.email}</td>
+                                <td>{dynamicComponent.first_name}</td>
+                                <td>{dynamicComponent.last_name}</td>
+                                <td>{dynamicComponent.phone}</td>
+                                <td>{dynamicComponent.city}</td>
+                                <td>
+                                    <i className="fa fa-edit" onClick={this.editTableRow.bind(this,index)}></i>
+                                    <i className="fa fa-times" onClick={this.deleteTableRow.bind(this,index)}></i>
+                                </td>
+                            </tr>
+                            }
+                        </tbody>) : <tbody><tr><td className="norecords" colSpan="6">No Records</td></tr></tbody>}
+                    </table>
+                </div>
+
+
+
+
+                <div className="regContainer" style={{background:'#57b3f1'}}>
 
                     <h2>Registration Page</h2>
+                    
+                    
                     <div className="regInnCont">
                         <div className="fields">
                             <div className="fieldname">UserName / Email :</div>
