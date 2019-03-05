@@ -72,6 +72,175 @@ export default class PSTNForm extends Component {
 
   }
   render() {
+     /*  .form-group.required .control-label:after {
+      color: #d00;
+      content: "*";
+      margin-left: 8px;
+      top: 7px;
+      font-family: 'Glyphicons Halflings';
+      font-weight: normal;
+      font-size: 10px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 6px 12px;
+      margin-bottom: 0;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.42857143;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
+      -ms-touch-action: manipulation;
+      touch-action: manipulation;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      background-image: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+
+
+    }
+
+    .btn-primary {
+      background-image: -webkit-linear-gradient(top, rgb(31, 78, 121) 0, rgb(31, 78, 121) 100%) !important;
+      background-image: -o-linear-gradient(top, rgb(31, 78, 121) 0, rgb(31, 78, 121) 100%) !important;
+      background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(31, 78, 121)), to(rgb(31, 78, 121)))!important;
+      background-image: linear-gradient(to bottom, rgb(31, 78, 121) 0, rgb(31, 78, 121) 100%) !important;
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='rgb(31, 78, 121)', endColorstr='rgb(31, 78, 121)', GradientType=0) !important;
+      filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+      background-repeat: repeat-x;
+      border-color: rgb(31, 78, 121);
+    }
+
+    .btn-primary {
+      color: #fff;
+      background-color: rgb(31, 78, 121) !important;
+      border-color: rgb(31, 78, 121) !important;
+    }
+
+    .btn-danger,
+    .btn-default,
+    .btn-info,
+    .btn-primary,
+    .btn-success,
+    .btn-warning {
+      text-shadow: 0 -1px 0 rgba(0, 0, 0, .2);
+      -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 1px rgb(31, 78, 121) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 1p x rgb(31, 78, 121) !important;
+    }
+
+    .image-span {
+      position: absolute;
+      top: 8px;
+      left: 117px;
+      background: #fff;
+      padding: 0px 25px 1px 21px;
+    }
+
+
+
+    .inner_container {
+      min-height: 500px;
+      height: auto;
+      width: 50%;
+      margin: auto;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+   
+
+    .todocont {
+      background-color: darkgrey;
+
+      text-align: center;
+      padding: 10px 5px;
+    }
+
+    .listItems {
+      background-color: #eee;
+    }
+
+    .listItems ul {
+      list-style-type: none;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    .listItems ul li {
+      list-style: none;
+      width: 100%;
+      border-bottom: 1px solid #fff;
+      padding: 10px 8px;
+      font-family: Verdana;
+    }
+
+    .pending {
+      color: #ff0000;
+    }
+
+    .formInput {
+      display: inline;
+      width: 70%;
+      height: 36px;
+      padding: 6px 12px;
+      font-size: 14px;
+      line-height: 1.42857143;
+      color: #555;
+      background-color: #fff;
+      background-image: none;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      vertical-align:middle;
+    }
+    
+    .actions{
+      display: inline;
+    }
+    .completed {
+      color: green;
+    }
+
+    .completed span{
+      float: right;
+     
+    }
+    .completed .fa-check-circle {     
+      font-size: 24px;
+      color: green;
+    }
+    
+    .pending span{
+      cursor: pointer;
+      float: right;
+      
+    }
+    .pending .fa-check-circle {     
+      font-size: 24px;
+      color: #ccc;      
+    }
+    .pending .fa-times-circle {     
+      font-size: 24px;
+      color: #ff0000; 
+      padding-left: 10px;     
+    }
+    .pending .fa-pencil-square-o{
+      font-size: 24px;
+      color: #ff0000; 
+      padding-left: 10px;     
+    }
+    .pending .fa-info{
+      font-size: 24px;
+      color:#0f74a5b8; 
+      padding-left: 10px;  
+    }
+    .actions > .btn{
+      margin: 0 5px;
+    } */
     //console.log(this.state.todoOutput, "OUPTPTU");
     return (
       <div className="container">
