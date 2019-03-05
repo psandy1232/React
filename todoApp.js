@@ -134,7 +134,7 @@ export default class PSTNForm extends Component {
                     </li>
                   )
                   :
-                  <li key={1} className="error text-center">You haven't Created to do list yet.</li>
+                  <li key={1} className="error text-center">You have not Created to do list yet.</li>
               }
 
             </ul>
